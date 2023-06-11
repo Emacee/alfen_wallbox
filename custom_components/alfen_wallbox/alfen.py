@@ -124,6 +124,19 @@ class AlfenDevice:
         await self._session.request(ssl=self.ssl, method='POST', headers = HEADER_JSON, url=self.__get_url('logout'))
         await self._do_update()        
 
+    async def set_charging_phases(self, enabled):
+        _LOGGER.debug(f'Set charging phases {enabled}A')
+
+        value = 1
+        if enabled:
+            value = 3
+
+        await self._session.request(ssl=self.ssl, method='POST', headers = HEADER_JSON, url=self.__get_url('login'), json={'username': self.username, 'password': self.password})
+        response = await self._session.request(ssl=self.ssl, method='POST', headers = POST_HEADER_JSON, url=self.__get_url('prop'), json={'2189_0': {'id': '2189_0', 'value': value}})
+        _LOGGER.debug(f'Set charging phases {response}')
+        await self._session.request(ssl=self.ssl, method='POST', headers = HEADER_JSON, url=self.__get_url('logout'))
+        await self._do_update()      
+        
     def __get_url(self, action):
         return 'https://{}/api/{}'.format(self.host, action)
 
@@ -161,7 +174,9 @@ class AlfenStatus:
             elif prop['id'] == '2129_0':
                 self.current_limit = prop['value'] 
             elif prop['id'] == '2126_0':
-                self.auth_mode = self.auth_mode_as_str(prop['value']) 
+                self.auth_mode = self.auth_mode_as_str(prop['value'])
+            elif prop['id'] == '2189_0':
+                self.charging_phases = prop['value'] 
 
     def auth_mode_as_str(self, code):
         switcher = {
