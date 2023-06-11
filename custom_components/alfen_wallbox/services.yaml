@@ -14,6 +14,13 @@ set_current_limit:
     limit:
       description: New limit.
 
+set_charging_phases:
+  description: Set number of charging phases
+  fields:
+    entity_id:
+      description: Name(s) of entities to change.
+      example: "alfen_wallbox.garage"
+
 enable_rfid_authorization_mode:
   description: Enables RFID auth mode
   fields:
